@@ -182,8 +182,9 @@ private:
 * 
 * - Add the .h and .cpp file to your project - that's all.
 *
-* - To get extra speed on Apple platforms, you might want to link the Apple
-*   Accelerate framework to your project and define AUDIOFFT_APPLE_ACCELERATE.
+* - To get extra speed on Apple platforms, you can link the Apple
+*   Accelerate framework to your project and define
+*   AUDIOFFT_APPLE_ACCELERATE.
 *
 *
 * Remarks:
@@ -194,16 +195,18 @@ private:
 *
 * Example usage:
 * @code
+* #include "AudioFFT.h"
+*
 * void Example()
 * {
 *   const size_t fftSize = 1024; // Needs to be power of 2!
 *
 *   std::vector<float> input(fftSize, 0.0f);
-*   std::vector<float> re(fftaudio::FFTAudio::ComplexSize(fftSize); 
-*   std::vector<float> im(fftaudio::FFTAudio::ComplexSize(fftSize); 
+*   std::vector<float> re(fftaudio::AudioFFT::ComplexSize(fftSize); 
+*   std::vector<float> im(fftaudio::AudioFFT::ComplexSize(fftSize); 
 *   std::vector<float> output(fftSize);
 *
-*   fftaudio::FFTAudio fft;
+*   audiofft::AudioFFT fft;
 *   fft.init(1024);
 *   fft.fft(input.data(), re.data(), im.data());
 *   fft.ifft(output.data(), re.data(), im.data());
