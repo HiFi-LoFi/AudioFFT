@@ -689,7 +689,7 @@ void OouraFFT::rftbsub(int n, double *a, int nc, double *c)
 AppleAccelerateFFT::AppleAccelerateFFT() :
   _size(0),
   _powerOf2(0),
-  _fftSetup(nullptr),
+  _fftSetup(0),
   _re(),
   _im()
 {
@@ -711,7 +711,7 @@ void AppleAccelerateFFT::init(size_t size)
     vDSP_destroy_fftsetup(_fftSetup);
     _size = 0;
     _powerOf2 = 0;
-    _fftSetup = nullptr;
+    _fftSetup = 0;
     _re.clear();
     _im.clear();
   }
