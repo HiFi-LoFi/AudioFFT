@@ -1,22 +1,18 @@
 // ==================================================================================
 // Copyright (c) 2012 HiFi-LoFi
 //
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is furnished
-// to do so, subject to the following conditions:
+// This is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
 //
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-// 
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-// FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-// COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-// IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-// WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // ==================================================================================
 
 #include "AudioFFT.h"
@@ -67,19 +63,32 @@ void OouraFFT::init(size_t size)
   
 void OouraFFT::fft(const float* data, float* re, float* im)
 {
-  for (size_t i=0; i<_size; ++i)
+  // Convert into the format as required by the Ooura FFT
   {
-    _buffer[i] = static_cast<double>(data[i]);
+    double* b = &_buffer[0];
+    double* bEnd = b + _size;
+    const float *d = data;
+    while (b != bEnd)
+    {
+      *(b++) = static_cast<double>(*(d++));
+    }
   }
-
+  
   rdft(static_cast<int>(_size), +1, _buffer.data(), _ip.data(), _w.data());
-
-  const size_t size2 = _size / 2;
-  for (size_t i=0; i<size2; ++i)
+  
+  // Convert to split-complex
   {
-    re[i] = static_cast<float>(_buffer[2*i+0]);
-    im[i] = -static_cast<float>(_buffer[2*i+1]);
+    double* b = &_buffer[0];
+    double* bEnd = b + _size;
+    float *r = re;
+    float *i = im;
+    while (b != bEnd)
+    {
+      *(r++) = static_cast<float>(*(b++));
+      *(i++) = static_cast<float>(-(*(b++)));
+    }
   }
+  const size_t size2 = _size / 2;
   re[size2] = -im[0];
   im[0] = 0.0;
   im[size2] = 0.0;
@@ -88,20 +97,32 @@ void OouraFFT::fft(const float* data, float* re, float* im)
 
 void OouraFFT::ifft(float* data, const float* re, const float* im)
 {
-  const size_t size2 = _size / 2;
-  for (size_t i=0; i<size2; ++i)
+  // Convert into the format as required by the Ooura FFT
   {
-    _buffer[2*i+0] = static_cast<double>(re[i]);
-    _buffer[2*i+1] = -static_cast<double>(im[i]);
+    double* b = &_buffer[0];
+    double* bEnd = b + _size;
+    const float *r = re;
+    const float *i = im;
+    while (b != bEnd)
+    {
+      *(b++) = static_cast<double>(*(r++));
+      *(b++) = -static_cast<double>(*(i++));
+    }
+    _buffer[1] = re[_size / 2];
   }
-  _buffer[1] = re[size2];
 
   rdft(static_cast<int>(_size), -1, _buffer.data(), _ip.data(), _w.data());
 
-  const double factor = 2.0 / static_cast<double>(_size);
-  for (size_t i=0; i<_size; ++i)
+  // Scaling and data type conversion
   {
-    data[i] = static_cast<float>(_buffer[i] * factor);
+    const double factor = 2.0 / static_cast<double>(_size);
+    double* b = &_buffer[0];
+    double* bEnd = b + _size;
+    float *d = data;
+    while (b != bEnd)
+    {
+      *(d++) = static_cast<float>(*(b++) * factor);
+    }
   }
 }
 
