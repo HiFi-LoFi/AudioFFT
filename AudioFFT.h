@@ -62,6 +62,8 @@
 * - AudioFFT is not intended to be the fastest FFT, but to be a fast-enough
 *   FFT suitable for most audio applications.
 *
+* - AudioFFT uses the quite liberal MIT license.
+*
 *
 * Example usage:
 * @code
