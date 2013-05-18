@@ -44,7 +44,6 @@ AudioFFT provides real-to-complex/complex-to-real FFT routines.
 
 ## Example usage ##
 
-    ```c++
     #include "AudioFFT.h"
     
     void Example()
@@ -61,7 +60,6 @@ AudioFFT provides real-to-complex/complex-to-real FFT routines.
       fft.fft(input.data(), re.data(), im.data());
       fft.ifft(output.data(), re.data(), im.data());
     }
-    ```
 
 
 ## Benchmarks ##
@@ -76,9 +74,10 @@ KissFFT, which is a quite popular FFT implementation, and which is also able
 to handle non-power-of-2 sizes. :-)
 
 
-CPU: Intel Core i5 (2,4 GHz)
-Mac OS X Lion 10.7.5
-Compiler: Apple LLVM 3.0 (/Os (fastest, smallest), SSE enabled) 
+#### CPU: Intel Core i5 (2,4 GHz) ####
+- Mac OS X Lion 10.7.5
+- Compiler: Apple LLVM 3.0 (/Os (fastest, smallest), SSE enabled) 
+
 | Size |  Ooura  |  FFTW3  |  Apple  | KissFFT |
 | ----:| -------:| -------:| -------:| -------:|
 |   64 |  8.805s |  6.914s |  3.420s | 12.496s |
@@ -88,9 +87,10 @@ Compiler: Apple LLVM 3.0 (/Os (fastest, smallest), SSE enabled)
 | 4096 | 14.840s |  7.517s |  3.661s | 19.379s |
 
 
-CPU: Intel Xeon (2.93 GHz)
-Windows 7
-Compiler: VC10 (/O2 /arch:SSE2 /fp:precise)
+#### CPU: Intel Xeon (2.93 GHz) ####
+- Windows 7
+- Compiler: VC10 (/O2 /arch:SSE2 /fp:precise)
+
 | Size |  Ooura  |  FFTW3  | KissFFT |
 | ----:| -------:| -------:| -------:|
 |   64 |  7.267s |  4.625s | 20.819s |
