@@ -53,8 +53,8 @@ AudioFFT provides real-to-complex/complex-to-real FFT routines.
       const size_t fftSize = 1024; // Needs to be power of 2!
       
       std::vector<float> input(fftSize, 0.0f);
-      std::vector<float> re(fftaudio::AudioFFT::ComplexSize(fftSize); 
-      std::vector<float> im(fftaudio::AudioFFT::ComplexSize(fftSize); 
+      std::vector<float> re(fftaudio::AudioFFT::ComplexSize(fftSize)); 
+      std::vector<float> im(fftaudio::AudioFFT::ComplexSize(fftSize)); 
       std::vector<float> output(fftSize);
       
       audiofft::AudioFFT fft;
