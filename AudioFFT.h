@@ -10,7 +10,7 @@
 //
 // The above copyright notice and this permission notice shall be included in
 // all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
 // FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
@@ -25,7 +25,7 @@
 
 /**
 * AudioFFT provides real-to-complex/complex-to-real FFT routines.
-* 
+*
 * Features:
 *
 * - Real-complex FFT and complex-real inverse FFT for power-of-2-sized real data.
@@ -44,7 +44,7 @@
 *
 *
 * How to use it in your project:
-* 
+*
 * - Add the .h and .cpp file to your project - that's all.
 *
 * - To get extra speed, you can link FFTW3 to your project and define
@@ -93,10 +93,10 @@
 
 namespace audiofft
 {
-  
+
   namespace details
   {
-    
+
     class AudioFFTImpl
     {
     public:
@@ -105,17 +105,17 @@ namespace audiofft
       virtual void init(size_t size) = 0;
       virtual void fft(const float* data, float* re, float* im) = 0;
       virtual void ifft(float* data, const float* re, const float* im) = 0;
-      
+
     private:
       AudioFFTImpl(const AudioFFTImpl&) = delete;
       AudioFFTImpl& operator=(const AudioFFTImpl&) = delete;
     };
   }
-  
-  
+
+
   // ======================================================
-  
-  
+
+
   /**
    * @class AudioFFT
    * @brief Performs 1D FFTs
@@ -127,13 +127,13 @@ namespace audiofft
      * @brief Constructor
      */
     AudioFFT();
-    
+
     /**
      * @brief Initializes the FFT object
      * @param size Size of the real input (must be power 2)
      */
     void init(size_t size);
-    
+
     /**
      * @brief Performs the forward FFT
      * @param data The real input data (has to be of the length as specified in init())
@@ -141,7 +141,7 @@ namespace audiofft
      * @param im The imaginary part of the complex output (has to be of length as returned by ComplexSize())
      */
     void fft(const float* data, float* re, float* im);
-    
+
     /**
      * @brief Performs the inverse FFT
      * @param data The real output data (has to be of the length as specified in init())
@@ -149,22 +149,26 @@ namespace audiofft
      * @param im The imaginary part of the complex input (has to be of length as returned by ComplexSize())
      */
     void ifft(float* data, const float* re, const float* im);
-    
+
     /**
      * @brief Calculates the necessary size of the real/imaginary complex arrays
      * @param size The size of the real data
      * @return The size of the real/imaginary complex arrays
      */
     static size_t ComplexSize(size_t size);
-    
+
   private:
     std::unique_ptr<details::AudioFFTImpl> _impl;
-    
+
     AudioFFT(const AudioFFT&) = delete;
     AudioFFT& operator=(const AudioFFT&) = delete;
   };
-  
-  
+
+
+  /**
+   * @deprecated
+   * @brief Let's keep an AudioFFTBase type around for now because it has been here already in the 1st version in order to avoid breaking existing code.
+   */
   typedef AudioFFT AudioFFTBase;
 
 } // End of namespace
