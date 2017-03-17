@@ -93,28 +93,15 @@
 
 namespace audiofft
 {
-
-  namespace details
+  
+  namespace detail
   {
-
-    class AudioFFTImpl
-    {
-    public:
-      AudioFFTImpl() = default;
-      virtual ~AudioFFTImpl() = default;
-      virtual void init(size_t size) = 0;
-      virtual void fft(const float* data, float* re, float* im) = 0;
-      virtual void ifft(float* data, const float* re, const float* im) = 0;
-
-    private:
-      AudioFFTImpl(const AudioFFTImpl&) = delete;
-      AudioFFTImpl& operator=(const AudioFFTImpl&) = delete;
-    };
+    class AudioFFTImpl;
   }
-
-
-  // ======================================================
-
+  
+  
+  // =============================================================
+  
 
   /**
    * @class AudioFFT
@@ -127,6 +114,14 @@ namespace audiofft
      * @brief Constructor
      */
     AudioFFT();
+    
+    AudioFFT(const AudioFFT&) = delete;
+    AudioFFT& operator=(const AudioFFT&) = delete;
+
+    /**
+     * @brief Destructor
+     */
+    ~AudioFFT();
 
     /**
      * @brief Initializes the FFT object
@@ -158,10 +153,7 @@ namespace audiofft
     static size_t ComplexSize(size_t size);
 
   private:
-    std::unique_ptr<details::AudioFFTImpl> _impl;
-
-    AudioFFT(const AudioFFT&) = delete;
-    AudioFFT& operator=(const AudioFFT&) = delete;
+    std::unique_ptr<detail::AudioFFTImpl> _impl;
   };
 
 
