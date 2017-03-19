@@ -132,13 +132,13 @@ namespace audiofft
     virtual void fft(const float* data, float* re, float* im) override
     {
       // Convert into the format as required by the Ooura FFT
-      detail::ConvertBuffer(&_buffer[0], data, _size);
+      detail::ConvertBuffer(_buffer.data(), data, _size);
 
       rdft(static_cast<int>(_size), +1, _buffer.data(), _ip.data(), _w.data());
 
       // Convert back to split-complex
       {
-        double* b = &_buffer[0];
+        double* b = _buffer.data();
         double* bEnd = b + _size;
         float *r = re;
         float *i = im;
@@ -158,7 +158,7 @@ namespace audiofft
     {
       // Convert into the format as required by the Ooura FFT
       {
-        double* b = &_buffer[0];
+        double* b = _buffer.data();
         double* bEnd = b + _size;
         const float *r = re;
         const float *i = im;
@@ -173,7 +173,7 @@ namespace audiofft
       rdft(static_cast<int>(_size), -1, _buffer.data(), _ip.data(), _w.data());
 
       // Convert back to split-complex
-      detail::ScaleBuffer(data, &_buffer[0], 2.0 / static_cast<double>(_size), _size);
+      detail::ScaleBuffer(data, _buffer.data(), 2.0 / static_cast<double>(_size), _size);
     }
 
   private:
@@ -946,8 +946,8 @@ namespace audiofft
         if (size > 0)
         {
           _size = size;
-          _complexSize = ComplexSize(_size);
-          const size_t complexSize = ComplexSize(_size);
+          _complexSize = AudioFFT::ComplexSize(_size);
+          const size_t complexSize = AudioFFT::ComplexSize(_size);
           _data = reinterpret_cast<float*>(fftwf_malloc(_size * sizeof(float)));
           _re = reinterpret_cast<float*>(fftwf_malloc(complexSize * sizeof(float)));
           _im = reinterpret_cast<float*>(fftwf_malloc(complexSize * sizeof(float)));
@@ -970,12 +970,12 @@ namespace audiofft
       ::memcpy(im, _im, _complexSize * sizeof(float));
     }
 
-    void ifft(float* data, const float* re, const float* im)
+    virtual void ifft(float* data, const float* re, const float* im) override
     {
       ::memcpy(_re, re, _complexSize * sizeof(float));
       ::memcpy(_im, im, _complexSize * sizeof(float));
       fftwf_execute_split_dft_c2r(_planBackward, _re, _im, _data);
-      ScaleBuffer(data, _data, 1.0f / static_cast<float>(_size), _size);
+      detail::ScaleBuffer(data, _data, 1.0f / static_cast<float>(_size), _size);
     }
 
   private:
