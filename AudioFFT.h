@@ -1,5 +1,5 @@
 // ==================================================================================
-// Copyright (c) 2016 HiFi-LoFi
+// Copyright (c) 2017 HiFi-LoFi
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -93,15 +93,15 @@
 
 namespace audiofft
 {
-  
+
   namespace detail
   {
     class AudioFFTImpl;
   }
-  
-  
+
+
   // =============================================================
-  
+
 
   /**
    * @class AudioFFT
@@ -114,7 +114,7 @@ namespace audiofft
      * @brief Constructor
      */
     AudioFFT();
-    
+
     AudioFFT(const AudioFFT&) = delete;
     AudioFFT& operator=(const AudioFFT&) = delete;
 

@@ -1,5 +1,5 @@
 // ==================================================================================
-// Copyright (c) 2016 HiFi-LoFi
+// Copyright (c) 2017 HiFi-LoFi
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -47,7 +47,7 @@ namespace audiofft
 
   namespace detail
   {
-    
+
     class AudioFFTImpl
     {
     public:
@@ -59,8 +59,8 @@ namespace audiofft
       virtual void fft(const float* data, float* re, float* im) = 0;
       virtual void ifft(float* data, const float* re, const float* im) = 0;
     };
-  
-  
+
+
     constexpr bool IsPowerOf2(size_t val)
     {
       return (val == 1 || (val & (val-1)) == 0);
@@ -85,7 +85,7 @@ namespace audiofft
         dest[i] = static_cast<TypeDest>(static_cast<TypeFactor>(src[i]) * factor);
       }
     }
-    
+
   } // End of namespace detail
 
 
@@ -110,7 +110,7 @@ namespace audiofft
       _buffer()
     {
     }
-    
+
     OouraFFT(const OouraFFT&) = delete;
     OouraFFT& operator=(const OouraFFT&) = delete;
 
@@ -758,7 +758,7 @@ namespace audiofft
     }
   };
 
-  
+
   /**
    * @internal
    * @brief Concrete FFT implementation
@@ -792,10 +792,10 @@ namespace audiofft
       _im()
     {
     }
-    
+
     AppleAccelerateFFT(const AppleAccelerateFFT&) = delete;
     AppleAccelerateFFT& operator=(const AppleAccelerateFFT&) = delete;
-    
+
     virtual ~AppleAccelerateFFT()
     {
       init(0);
@@ -866,7 +866,7 @@ namespace audiofft
     std::vector<float> _im;
   };
 
-  
+
   /**
    * @internal
    * @brief Concrete FFT implementation
@@ -902,7 +902,7 @@ namespace audiofft
       _im(0)
     {
     }
-    
+
     FFTW3FFT(const FFTW3FFT&) = delete;
     FFTW3FFT& operator=(const FFTW3FFT&) = delete;
 
@@ -988,7 +988,7 @@ namespace audiofft
     float* _im;
   };
 
-  
+
   /**
    * @internal
    * @brief Concrete FFT implementation
@@ -1007,12 +1007,12 @@ namespace audiofft
   {
   }
 
-  
+
   AudioFFT::~AudioFFT()
   {
   }
-  
-  
+
+
   void AudioFFT::init(size_t size)
   {
     assert(detail::IsPowerOf2(size));
