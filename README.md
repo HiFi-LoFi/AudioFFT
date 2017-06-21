@@ -7,8 +7,7 @@ AudioFFT provides real-to-complex/complex-to-real FFT routines.
 
 - Real-complex FFT and complex-real inverse FFT for power-of-2-sized real data.
 
-- Uniform interface to different FFT implementations (currently Ooura, FFTW3 and
-  Apple Accelerate).
+- Uniform interface to different FFT implementations (currently Ooura, FFTW3, Apple Accelerate and Intel IPP).
 
 - Complex data is handled in "split-complex" format, i.e. there are separate
   arrays for the real and imaginary parts which can be useful for SIMD optimizations
@@ -31,10 +30,9 @@ AudioFFT provides real-to-complex/complex-to-real FFT routines.
   according license).
 
 - To get the best speed on Apple platforms, you can link the Apple
-  Accelerate framework to your project and define
-  AUDIOFFT_APPLE_ACCELERATE  (however, please check whether your
-  project suits the according license).
+  Accelerate framework to your project and define AUDIOFFT_APPLE_ACCELERATE.
 
+- On any supported platform you can use Intel IPP's FFT's by linking to IPP and defining AUDIOFFT_INTEL_IPP.
 
 ## Remarks ##
 
