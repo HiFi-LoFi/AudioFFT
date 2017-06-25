@@ -26,7 +26,10 @@
 #include <cstring>
 
 
-#if defined(AUDIOFFT_APPLE_ACCELERATE)
+#if defined(AUDIOFFT_INTEL_IPP)
+  #define AUDIOFFT_INTEL_IPP_USED
+  #include <ipp.h>
+#elif defined(AUDIOFFT_APPLE_ACCELERATE)
   #define AUDIOFFT_APPLE_ACCELERATE_USED
   #include <Accelerate/Accelerate.h>
   #include <vector>
@@ -767,6 +770,163 @@ namespace audiofft
 
 
 #endif // AUDIOFFT_OOURA_USED
+
+
+  // ================================================================
+
+
+#ifdef AUDIOFFT_INTEL_IPP_USED
+
+
+  /**
+   * @internal
+   * @class IntelIppFFT
+   * @brief FFT implementation using the Intel Integrated Performance Primitives
+   */
+  class IntelIppFFT : public detail::AudioFFTImpl
+  {
+  public:
+    IntelIppFFT() :
+      detail::AudioFFTImpl(),
+      _size(0),
+      _operationalBufferSize(0),
+      _powerOf2(0),
+      _fftSpec(nullptr),
+      _fftSpecBuf(0),
+      _fftWorkBuf(0),
+      _operationalBuffer(nullptr)
+    {
+      ippInit();
+    }
+
+    IntelIppFFT(const IntelIppFFT&) = delete;
+    IntelIppFFT& operator=(const IntelIppFFT&) = delete;
+
+    virtual ~IntelIppFFT()
+    {
+      init(0);
+    }
+
+    virtual void init(size_t size) override
+    {
+      if (_fftSpec)
+      {
+        if (_fftWorkBuf) ippFree(_fftWorkBuf);
+        if (_fftSpecBuf) ippFree(_fftSpecBuf);
+        ippFree(_operationalBuffer);
+
+        _size = 0;
+        _operationalBufferSize = 0;
+        _powerOf2 = 0;
+        _fftSpec = 0;
+      }
+
+      if (size > 0)
+      {
+        _size = size;
+        _operationalBufferSize = _size + 2;
+        _powerOf2 = (int)(log((double)_size)/log(2.0));
+
+        // Query to get buffer sizes
+        int sizeFFTSpec,
+          sizeFFTInitBuf,
+          sizeFFTWorkBuf;
+        ippsFFTGetSize_R_32f(
+          _powerOf2,
+          IPP_FFT_NODIV_BY_ANY,
+          ippAlgHintAccurate,
+          &sizeFFTSpec,
+          &sizeFFTInitBuf,
+          &sizeFFTWorkBuf
+        );
+
+        Ipp8u* fftInitBuf;
+
+        // init buffers
+        _fftSpecBuf = ippsMalloc_8u(sizeFFTSpec);
+        _fftWorkBuf = ippsMalloc_8u(sizeFFTWorkBuf);
+        fftInitBuf = ippsMalloc_8u(sizeFFTInitBuf);
+
+        // Initialize FFT
+        ippsFFTInit_R_32f(
+          &_fftSpec,
+          _powerOf2,
+          IPP_FFT_NODIV_BY_ANY, 
+          ippAlgHintAccurate,
+          _fftSpecBuf,
+          fftInitBuf
+        );
+        if (fftInitBuf) ippFree(fftInitBuf);
+
+        // init operational buffer
+        _operationalBuffer = ippsMalloc_32f(
+          _operationalBufferSize
+        );
+      }
+    }
+
+    virtual void fft(const float* data, float* re, float* im) override
+    {
+      size_t complexNumbersCount = _operationalBufferSize / 2;
+      ippsFFTFwd_RToCCS_32f(
+        data,
+        _operationalBuffer,
+        _fftSpec,
+        _fftWorkBuf
+      );
+
+      // no need to scale
+
+      size_t complexCounter = 0;
+      for (int i = 0; i < complexNumbersCount; ++i)
+      {
+        re[i] = _operationalBuffer[complexCounter++];
+        im[i] = _operationalBuffer[complexCounter++];
+      }
+    }
+
+    virtual void ifft(float* data, const float* re, const float* im) override
+    {
+      size_t complexNumbersCount = _operationalBufferSize / 2;
+
+      size_t complexCounter = 0;
+      for (int i = 0; i < complexNumbersCount; ++i)
+      {
+        _operationalBuffer[complexCounter++] = re[i];
+        _operationalBuffer[complexCounter++] = im[i];
+      }
+
+      ippsFFTInv_CCSToR_32f(
+        _operationalBuffer,
+        data,
+        _fftSpec,
+        _fftWorkBuf
+      );
+
+      // scaling
+      const float factor = 1.0f / static_cast<float>(_size);
+      ippsMulC_32f_I(factor, data, _size);
+    }
+
+  private:
+    size_t _size;
+    size_t _operationalBufferSize;
+    size_t _powerOf2;
+    IppsFFTSpec_R_32f* _fftSpec;
+    Ipp8u* _fftSpecBuf;
+    Ipp8u* _fftWorkBuf;
+    Ipp32f* _operationalBuffer;
+  };
+
+
+  /**
+   * @internal
+   * @brief Concrete FFT implementation
+   */
+  typedef IntelIppFFT AudioFFTImplementation;
+
+
+#endif // AUDIOFFT_INTEL_IPP_USED
 
 
   // ================================================================
